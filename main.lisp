@@ -9,7 +9,7 @@
 (defun add-todo (todo todo-list)
   (vector-push-extend todo todo-list))
 
-;;; used to test 
+;;; TODO: Remove this stuff from here
 ;;; (add-todo (create-todo 10 1 "message a") *todos*)
 ;;; (add-todo (create-todo 20 2 "message b") *todos*)
 
@@ -27,6 +27,7 @@
 
 (defun collect-lines-file ()
   (with-open-file (stream "test.txt")
+    ;; TODOO: Find a way to also collect the line numbers
     (loop for line = (read-line stream nil)
          while line
 	 when (search "TODO" line)
@@ -46,3 +47,9 @@
                  (incf i)))
           acc)
         0)))  
+
+(defun parse-todo (line)
+  (let ((parts (str:split ":" line :omit-nulls t)))
+    (create-todo 0 (measure-weight
+		    (car parts))
+		 (str:trim (str:join " " (cdr parts))))))
