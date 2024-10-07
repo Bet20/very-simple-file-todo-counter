@@ -2,7 +2,6 @@
 (defstruct todo line-number weight message)
 
 (defun create-todo (line-number weight message)
-  "Adds a todo to the *todos* hash"
     (make-todo :line-number line-number
 	       :weight weight
 	       :message message))
@@ -15,21 +14,18 @@
 ;;; (add-todo (create-todo 20 2 "message b") *todos*)
 
 (defun todo-heavier (a b)
-  "Compares the weight of a pair of todos"
   (> (todo-weight a) (todo-weight b)))
 
 (defun todo-lighter (a b)
   (< (todo-weight a) (todo-weight b)))
 
 (defun list-todos (todo-list direction)
-  "Lists todos by gravity"
   (if (equal direction "asc")
       (sort todo-list #'todo-lighter)
       (sort todo-list #'todo-heavier))
   )
 
 (defun collect-lines-file ()
-  "Prints the lines in a file to stdout."
   (with-open-file (stream "test.txt")
     (loop for line = (read-line stream nil)
          while line
@@ -38,10 +34,10 @@
 
 (defun measure-weight (line)
   "Measures how long the TODO is by counting consecutive 'O's after 'TODO'.
-   For example, 'TODO' returns 0, 'TODOOO' returns 2."
+   For example, 'TODO' returns 1, 'TODOOO' returns 3."
   (let ((begin (search "TODO" line)))
     (if begin ;; lets put this here just for caution
-        (let ((acc 0)
+        (let ((acc 1)
               (i (+ begin 4)))
           (loop
             while (and (< i (length line)) (char= (char line i) #\O))
