@@ -9,10 +9,6 @@
 (defun add-todo (todo todo-list)
   (vector-push-extend todo todo-list))
 
-;;; TODO: Remove this stuff from here
-;;; (add-todo (create-todo 10 1 "message a") *todos*)
-;;; (add-todo (create-todo 20 2 "message b") *todos*)
-
 (defun todo-heavier (a b)
   (> (todo-weight a) (todo-weight b)))
 
@@ -25,12 +21,13 @@
       (sort todo-list #'todo-heavier))
   )
 
-(defun collect-lines-file ()
-  (with-open-file (stream "test.txt")
+(defun collect-lines-file (file)
+  (with-open-file (stream file)
     ;; TODOO: Find a way to also collect the line numbers
     (loop for line = (read-line stream nil)
-         while line
-	 when (search "TODO" line)
+          while line
+	  ;; TODO: Find a better way to make sure they are just the ones we want
+	  when (and (search "TODO" line) (not (or (search "\"TODO" line) (search "'TODO" line))))
           collect line)))
 
 (defun measure-weight (line)
@@ -53,3 +50,28 @@
     (create-todo 0 (measure-weight
 		    (car parts))
 		 (str:trim (str:join " " (cdr parts))))))
+
+(defun weight-color (weight)
+  (cond
+    ((> weight 3) "31")
+    ((> weight 1) "33")
+    ("37")))
+
+(defun print-todo (todo)
+  (print
+   (format t "LINE: ~c[1;32m~D~c[0m | PRIORITY: ~c[1;~Dm~D~c[0m~%> ~x"
+	   #\ESC (todo-line-number todo) #\ESC
+	   #\ESC (weight-color (todo-weight todo)) (todo-weight todo) #\ESC
+	   (todo-message todo))
+   ))
+
+(defun run ()
+  "Really don't need the *todos* global but let's leave it for now"
+  (mapcar (lambda (it)
+	    (add-todo (parse-todo it) *todos*))
+	    (collect-lines-file "main.lisp"))
+
+  (loop for todo in (coerce *todos* 'list)
+	do (print-todo todo))) 
+			 
+		      
