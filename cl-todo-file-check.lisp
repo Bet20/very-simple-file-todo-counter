@@ -1,3 +1,6 @@
+;;; cl-todo-file-check.lisp
+(in-package #:cl-todo-file-check)
+
 (defparameter *todos* (make-array '(0) :adjustable t :fill-pointer t))
 (defstruct todo line-number weight message)
 
@@ -65,11 +68,11 @@
 	   (todo-message todo))
    ))
 
-(defun run ()
+(defun main ()
   "Really don't need the *todos* global but let's leave it for now"
   (mapcar (lambda (it)
 	    (add-todo (parse-todo it) *todos*))
-	    (collect-lines-file "main.lisp"))
+	    (collect-lines-file "cl-todo-file-check.lisp"))
 
   (loop for todo in (coerce *todos* 'list)
 	do (print-todo todo))) 
